@@ -172,7 +172,7 @@ public:
 	}
 	template<class K1, class V1>
 	const_iterator insertT(const K1& key, const V1 &val, bool replace=true){
-		insertPlaceResult<AVLNode> fr = findInsertPlaceF(key, (AVLNode*)&this->nil, _cmp);
+		InsertPlaceResult<AVLNode> fr = findInsertPlaceF(key, (AVLNode*)&this->nil, _cmp);
 		//AVLNode *pn = (AVLNode*)_findins(key);
 		if(fr.n->height() && !fr.c){
 			if(replace)(fr.n)->val = val;

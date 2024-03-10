@@ -24,10 +24,7 @@ protected:
 	//char *mbuf; //size of this buf must be f_size;
 	struct BNode;
 	struct BLeaf{
-//		union{
-	//		BLeaf *pl;
-			BNode *p;
-//		};
+		BNode *p;
 		struct{
 			unsigned int pnum : 16;
 			unsigned int knum : 15;
@@ -60,7 +57,7 @@ protected:
 			unsigned int pos : 16;
 			unsigned int is_eq : 1;
 		};
-		_findres(){}
+        _findres():n(nullptr), pos(0), is_eq(0){}
 		_findres(BNode *nn, int cc, bool eq){ n = nn; pos = cc; is_eq = eq ? 1 : 0; }
 		_findres(BLeaf *nn, int cc, bool eq){ l = nn; pos = cc; is_eq = eq ? 1 : 0; }
 	};

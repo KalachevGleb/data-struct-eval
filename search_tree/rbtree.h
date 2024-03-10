@@ -58,37 +58,19 @@ protected:
 		RBTNodeBase(){ is_nil = 0; }
 #endif
 	};
-/*	struct RBTNodeBase{
-		RBTNodeBase(){is_nil = false;}
-		RBTNodeBase *next(){return nextNode(this);}
-		RBTNodeBase *prev(){return prevNode(this);}
-		RBTNodeBase *l, *r, *p;
-		color c:2;
-		unsigned int is_nil:1;
-		bool isNil()const{return is_nil;}
-	};*/
-	//struct RBTNil:public RBTNodeBase{}
-	RBTNodeBase * rightrot(RBTNodeBase *n);
-	RBTNodeBase * leftrot(RBTNodeBase * n);
-	RBTNodeBase *rightlongrot(RBTNodeBase * n);
-	RBTNodeBase * leftlongrot(RBTNodeBase *n);
+
+	static RBTNodeBase * rightrot(RBTNodeBase *n);
+	static RBTNodeBase * leftrot(RBTNodeBase * n);
+	static RBTNodeBase *rightlongrot(RBTNodeBase * n);
+	static RBTNodeBase * leftlongrot(RBTNodeBase *n);
 	void insbalance(RBTNodeBase *x);
 	void delbalance(RBTNodeBase *x, RBTNodeBase *p);
 	bool _remove(RBTNodeBase *t);
-//	bool _enumerate(RBTNodeBase *n, int l, int r, int b, void *obj, bool push(void*, RBTNodeBase*));
-//	RBTNodeBase *_minY(int l, int r, int b, RBTNodeBase *n);
-//	bool _contains(const Point & pt)const{return !_find(pt)->is_nil;}
-//	const RBTNodeBase* _find(const Point & pt)const;
-//	bool extractMaxQX(RBTNodeBase*& t, RBTNodeBase *&ep, bool &duplAsP);
-//	void disposeP(RBTNodeBase *t);
-//	void extractP(RBTNodeBase *t);
-//	virtual RBTNodeBase *_insnode(int x, int y)=0;
 	RBTNodeBase *_first;
 	RBTNodeBase nil;
 	int sz;
 	void print(RBTNodeBase *n, int rec);
 	int check(RBTNodeBase *n);
-	//int checkPST(PSTNodeBase *n);
 public:
 	bool check(){return check(nil.left())>=0 && nil.left()->c()==BLACK &&
 		(nil.left()==&nil||nil.left()->up() == &nil);}
@@ -97,7 +79,7 @@ public:
 	int size()const{return sz;}
 
 	RBTBase();
-	~RBTBase();
+	~RBTBase() = default;
 
 	template<class T>
 	struct _default_cmp{
@@ -178,7 +160,7 @@ public:
 	}
 	template<class K1, class V1>
 	const_iterator insertT(const K1& key, const V1 &val, bool replace=true){
-		insertPlaceResult<RBTNode> pn = findInsertPlaceF(key, (RBTNode*)&this->nil, _cmp);
+		InsertPlaceResult<RBTNode> pn = findInsertPlaceF(key, (RBTNode*)&this->nil, _cmp);
 		if(!pn.n->isNil() && !pn.c){
 			if(replace)((RBTNode*)pn.n)->val = val;
 			return const_iterator(pn.n);

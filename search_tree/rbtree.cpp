@@ -12,8 +12,6 @@ RBTBase::RBTBase(){
 	sz=0;
 }
 
-RBTBase::~RBTBase(){}
-
 void RBTBase::print(RBTBase::RBTNodeBase *n, int rec){
 	if(n->isNil())return;
 	print(n->left(), rec+1);
@@ -75,8 +73,8 @@ bool RBTBase::_remove(RBTBase::RBTNodeBase *t){
 			tn->setL(t->left());                 /*       p        */
 			tn->left()->setP(tn);                /*        tn      */
 		}                                        /*       x  nil   */
-		if(tn->c() == RED)x=0;
-		else if(x->c() == RED){x->setC(BLACK); x=0;}
+		if(tn->c() == RED)x=nullptr;
+		else if(x->c() == RED){x->setC(BLACK); x=nullptr;}
 		tn->setC(t->c()); tn->setP(t->up());
 		if(t->up()->left() == t)t->up()->setL(tn);
 		else t->up()->setR(tn);
@@ -302,14 +300,3 @@ void RBTBase::delbalance(RBTBase::RBTNodeBase *x, RBTBase::RBTNodeBase *pn){
 	else pp->setR(x);
 	x->setP(pp);
 }
-/*RBTBase::RBTNodeBase *RBTBase::RBTNodeBase::prev(){
-	RBTBase::RBTNodeBase *p = this;
-	while(!p->isNil()){
-		if(!p->left()->isNil()){
-			for(p=p->left();!p->right()->isNil())p=p->right();
-			return p;
-		}
-		p = p->up();
-	}
-	return p;
-}*/

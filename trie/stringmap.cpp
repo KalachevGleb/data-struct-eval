@@ -1,7 +1,7 @@
 #include "stringmap.h"
-#include <string.h>
+#include <cstring>
 /** \class StringMap
-  *\brief Множество со строкой в качестве ключа.
+  *\brief РњРЅРѕР¶РµСЃС‚РІРѕ СЃРѕ СЃС‚СЂРѕРєРѕР№ РІ РєР°С‡РµСЃС‚РІРµ РєР»СЋС‡Р°.
   */
 
 template<class T> T Max(T x, T y){return x>y ? x : y;}
@@ -43,8 +43,8 @@ StringTreeBase::_Node *StringTreeBase::_find(const char *str)const{
 	return (_Node*)_nil;
 }
 
-int commonSymbols(const char* a, const char *b, int l){
-	int i;
+uint32_t commonSymbols(const char* a, const char *b, uint32_t l){
+	uint32_t i;
 	for(i=l; a[i]==b[i];)i++;
 	return i;
 }
@@ -128,7 +128,7 @@ void StringTreeBase::_delete(StringTreeBase::_Node *n){
 //AVL balancing with correcting fields sl ans sr of changed nodes
 void StringTreeBase::_balance(StringTreeBase::_Node *x){
 	for(;x->h; x = x->p){
-		int px = x->h;
+		auto px = x->h;
 		if(x->l->h == x->r->h+2){ //
 			_Node *d = x->l, *c = d->r, *e = d->l;// *a = x->r;
 			if(c->h <= e->h){
@@ -193,7 +193,8 @@ void StringTreeBase::_balance(StringTreeBase::_Node *x){
 StringTreeBase::StringTreeBase(StringTreeBase::_Node *nil){
 	nil->l = nil->r = nil->p = _nil = nil;
 	nil->next = nil->prev = nil;
-	nil->key = 0; nil->h = 0;
+	nil->key = nullptr;
+    nil->h = 0;
 	nil->sl = nil->sr = uint(-1);
 	_sz = 0;
 }
