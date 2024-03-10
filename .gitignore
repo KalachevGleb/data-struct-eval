@@ -1,6 +1,40 @@
 # Prerequisites
 *.d
 
+# IDE files
+.idea/
+.vscode/
+
+# System auxiliary files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+CMakeTmp/
+cmake-build-*/
+
+# Visual Studio auto-generated files
+.vs/
+*.sdf
+*.opensdf
+*.suo
+*.ncb
+*.[Mm]anifest
+GeneratedFiles/
+[Tt]emp/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+Win32/
+ipch/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -10,6 +44,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+
 
 # Compiled Dynamic libraries
 *.so
@@ -30,3 +65,6 @@
 *.exe
 *.out
 *.app
+
+# Log files
+*.log
