@@ -18,6 +18,8 @@ and speed tests of different search trees and sorting algorithms.
 
 - **misc/**: Miscellaneous files.
     - `pst.h`, `pst.cpp`: Implementation of a Priority Search Tree. Can be used to solve 3-sided range queries.
+    - `structs.h`: File with some data structures; some of them are probably duplicates of the ones in the other folders;
+       shoule be refactored in the future and split into different files.
 
 - **priority_queue/**: Priority queue implementation.
     - `priority_queue.h`: simple and efficient priority queue data structure for limited number of priorities.
