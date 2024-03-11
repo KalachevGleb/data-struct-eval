@@ -1,39 +1,40 @@
 #pragma once
-#ifndef HASH_T_H
-#define HASH_T_H
+#include <cstdint>
+#include <cstdio>
+#include <stdexcept>
+#include "hashfunctions.h"
+#include "item_memory.h"
 
-#include <stdio.h>
-#include "HashFunctions.h"
-#include "item_memory.cpp"
-#include "Stack.h"
+#define OUT_ERROR(S, ...) {     \
+        char t[1000];  \
+        sprintf_s<1000>(t, S, __VA_ARGS__); \
+        throw runtime_error(t); \
+    }
 
-#define U_HASH_DEFSIZE 10000
+constexpr int U_HASH_DEFSIZE = 10000
 
-#define LL_DELETEALL	-1
+constexpr int LL_DELETEALL = -1
 
-#define IHASH_MAX_C				20
-#define UHASH_NOTINIT			-1
+constexpr int IHASH_MAX_C = 20
+constexpr int UHASH_NOTINIT =-1
 
-#define FRF_FIND						1
-#define FRF_ONLYEXISTING	2
+#define FRF_FIND            1
+#define FRF_ONLYEXISTING    2
 
-#define FRF_DONOTHING		0
-#define FRF_REPLACE				4
-#define FRF_ADDBEFORE		8
-#define FRF_ADDAFTER			12
-#define FRF_ADDTODATA		16
-#define FRF_DOIFEXIST			28
+#define FRF_DONOTHING       0
+#define FRF_REPLACE         4
+#define FRF_ADDBEFORE       8
+#define FRF_ADDAFTER	    12
+#define FRF_ADDTODATA       16
+#define FRF_DOIFEXIST       28
 
 #define UHASH_FRF_FIND 						FRF_FIND
 #define UHASH_FRF_ONLYEXISTING 	FRF_ONLYEXISTING
 
 #define UHASH_FRF_DONOTHING 		FRF_DONOTHING
 #define UHASH_FRF_REPLACE 			FRF_REPLACE
-#define UHASH_FRF_ADDBEFORE 		FRF_ADDBEFORE
-#define UHASH_FRF_ADDAFTER 		FRF_ADDAFTER
-#define UHASH_FRF_DOIFEXIST 		FRF_DOIFEXIST
 
-#define UHASH_DELETEALL 	LL_DELETEALL
+constexpr int UHASH_DELETEALL = LL_DELETEALL;
 
 ////////////////////////////////////////////////////////
 class Std_Struct;
@@ -74,7 +75,7 @@ enum stdstr_type{
 	STP_DLINKEDLIST
 };
 //______________________________________________________
-struct ss_alloc_except
+struct ss_alloc_except: public std::exception
 {
 	string Where;
 	size_t size;
@@ -82,7 +83,7 @@ struct ss_alloc_except
 	ss_alloc_except() : Where(), size(0){}
 };
 ///======= BASE CLASS ========//
-class Std_Struct : public err_outp<Std_Struct>
+class Std_Struct
 {
 protected:
 	int ne;
@@ -5262,9 +5263,3 @@ int RB_Tree_KA<TD,TK>::_delete(const TK& Key, int N)
 	if(delete_(Key))return 1;
 	return -1;
 }
-
-///==================================//
-#undef T_DELETE
-#undef CMP_NUM
-//==================================//
-#endif //HASH_T_H
