@@ -1,0 +1,5 @@
+find_package(Catch2 REQUIRED)
+include(Catch)
+add_executable(unit_tests test_structures.cpp)
+target_link_libraries(unit_tests PRIVATE data_structures Catch2::Catch2WithMain)
+catch_discover_tests(unit_tests)
