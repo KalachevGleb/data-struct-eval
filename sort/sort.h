@@ -152,10 +152,10 @@ struct Random {
 uint64_t ncmp=0;
 
 extern "C" int icmp(const void *a,const void *b){
-	ncmp++;
-	int A=*(const int *)a;
-	int B=*(const int *)b;
-	return A<B ? -1 : A>B ? 1 : 0;
+        ncmp++;
+        int lhs_value = *(const int *)a;
+        int rhs_value = *(const int *)b;
+        return lhs_value < rhs_value ? -1 : lhs_value > rhs_value ? 1 : 0;
 }
 
 template<class T, class Less>
