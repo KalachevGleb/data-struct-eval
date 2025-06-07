@@ -3,17 +3,17 @@
 
 using namespace std;
 class PriorityQueue {
-	struct ListNode {
-		ListNode *prev, *next;
+	struct Node {
+		Node *prev, *next;
 		int w, n;
-		ListNode() {
+		Node() {
 			w = n = -1;
 			prev = next = this;
 		}
-		ListNode(ListNode &&n) {
-			*this = std::forward<ListNode>(n);
+		Node(Node &&n) {
+			*this = std::forward<Node>(n);
 		}
-		ListNode& operator=(ListNode &&n) {
+		Node& operator=(Node &&n) {
 			if (n.next == &n)
 				prev = next = this;
 			else {
@@ -24,22 +24,22 @@ class PriorityQueue {
 			this->n = n.n;
 			return *this;
 		}
-		void remove() {
+		void remove_from_list() {
 			prev->next = next;
 			next->prev = prev;
 		}
-		void del() { // delete from current list
-			remove();
+		void detach() { // delete from current list
+			remove_from_list();
 			next = 0;
 		}
-		void insert_in_list(ListNode &head) {
+		void insert_in_list(Node &head) {
 			next = head.next;
 			prev = &head;
 			head.next = next->prev = this;
 		}
 		bool in_list()const { return next != 0; }
 		bool is_empty()const { return next == this; }
-		ListNode(const ListNode &n) {
+		Node(const Node &n) {
 			this->n = n.n;
 			w = n.w;
 			prev = n.prev;
@@ -47,46 +47,46 @@ class PriorityQueue {
 		}
 	private:
 	};
-	int _size, _maxval, _minval;
-	vector<ListNode> nodes;        // memory for list nodes 
-	vector<ListNode> lists;   // array or cyclic linked lists
+	int size_, max_val_, min_val_;
+	vector<Node> nodes;        // memory for list nodes 
+	vector<Node> lists;   // array or cyclic linked lists
 public:
 	class ListIterator {
-		const ListNode *n;
+		const Node *n;
 		friend class PriorityQueue;
 	public:
-		ListIterator(const ListNode *node=0) { n = node; }
+		ListIterator(const Node *node=0) { n = node; }
 		ListIterator& operator++() { n = n->next; return *this; }
 		bool isValid()const { return n->w>=0; }
 		int operator*()const { return n->n; }
-		int w()const { return n->w; }
+		int weight()const { return n->w; }
 	};
 	class Element {
-		mutable ListNode *node;
+		mutable Node *node;
 		mutable PriorityQueue *qu;
-		Element(PriorityQueue*q, ListNode *n) :qu(q), node(n) {}
+		Element(PriorityQueue*q, Node *n) :qu(q), node(n) {}
 		friend class PriorityQueue;
 	public:
 		Element() { node = 0; qu = 0; }
 		const Element& operator+=(int delta)const {
 			if (!delta)return *this;
 			node->w += delta;
-			node->remove();
+			node->remove_from_list();
 			if (delta > 0) {
-				if (node->w > qu->_maxval) {
+				if (node->w > qu->max_val_) {
 					if (qu->lists.size() <= size_t(node->w))
 						qu->lists.resize(node->w + 1);
-					qu->_maxval = node->w;
+					qu->max_val_ = node->w;
 				}
-			} else if (node->w < qu->_minval)
-				qu->_minval = node->w;
+			} else if (node->w < qu->min_val_)
+				qu->min_val_ = node->w;
 			node->insert_in_list(qu->lists[node->w]);
 			if (delta > 0) {
-				while (qu->lists[qu->_minval].is_empty())
-					qu->_minval++;
+				while (qu->lists[qu->min_val_].is_empty())
+					qu->min_val_++;
 			} else {
-				while (qu->lists[qu->_maxval].is_empty())
-					qu->_maxval--;
+				while (qu->lists[qu->max_val_].is_empty())
+					qu->max_val_--;
 			}
 			return *this;
 		}
@@ -117,8 +117,8 @@ public:
 		}
 	};
 	void init(int sz, int maxval) {
-		_size = sz;
-		_maxval = _minval = 0;
+		size_ = sz;
+		max_val_ = min_val_ = 0;
 		nodes.resize(sz);
 		lists.resize(maxval+1);
 		for (int i = 0; i < sz; i++) {
@@ -131,17 +131,17 @@ public:
 		return Element(this, nodes.data() + i);
 	}
 	ConstElement operator[](int i)const {
-		return Element(const_cast<PriorityQueue*>(this), const_cast<ListNode*>(&nodes[i]));
+		return Element(const_cast<PriorityQueue*>(this), const_cast<Node*>(&nodes[i]));
 	}
 	int w(int i)const { return nodes[i].w; }
-	ListIterator getMaxIterator() { return ListIterator(lists[_maxval].next); }
-	ListIterator getMinIterator() { return ListIterator(lists[_minval].next); }
-	ListIterator getValIterator(int i) { return lists[i].next; }
-	int minW()const { return _minval; }
-	int maxW()const { return _maxval; }
-	void moveHead(int i, ListIterator it) {
+	ListIterator max_iterator() { return ListIterator(lists[max_val_].next); }
+	ListIterator min_iterator() { return ListIterator(lists[min_val_].next); }
+	ListIterator value_iterator(int i) { return lists[i].next; }
+	int min_weight()const { return min_val_; }
+	int max_weight()const { return max_val_; }
+	void move_head(int i, ListIterator it) {
 		if (!it.isValid())return;
-		ListNode *h = &lists[i], *n = (ListNode*)it.n, *p = n->prev;
+		Node *h = &lists[i], *n = (Node*)it.n, *p = n->prev;
 		if (n == h || p == h)return;
 		h->next->prev = h->prev;
 		h->prev->next = h->next;
@@ -149,6 +149,6 @@ public:
 		h->prev = p;
 		n->prev = p->next = h;
 	}
-	//typedef vector<ListNode>::const_iterator iterator;
+	//typedef vector<Node>::const_iterator iterator;
 	//iterator begin() {return }
 };

@@ -44,8 +44,21 @@ The project can be built using CMake. The following commands can be used to buil
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release 
+cmake --build . --config Release
 ```
+
+## Running clang-tidy
+
+The project ships with a `.clang-tidy` file that enforces naming conventions.
+You can run clang-tidy after generating the build directory:
+
+```bash
+cd build
+clang-tidy ../priority_queue/priority_queue.h -- -I..
+```
+
+Or rely on the `CMAKE_CXX_CLANG_TIDY` option, which will automatically run
+clang-tidy during builds when the tool is available.
 
 ## Running Speed Tests
 

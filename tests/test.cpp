@@ -297,7 +297,7 @@ std::ostream& operator<<(std::ostream &s, Point p){
 void testIntSort(int /*n*/){
 	//double t;
 	for(int k=20; k>=0; k--){
-		_sort_help::ncmp=0;
+                sort_help::compare_count = 0;
 		int N=100000000>>k;
 		std::vector<double> A(N), sd;
 		printf("N=%d\n",N);
@@ -306,7 +306,7 @@ void testIntSort(int /*n*/){
 		sd = A;
 		int_greater::nc = 0;
 		double t=clock();
-		_sort_help::msort(&sd[0],N, int_greater());
+                sort_help::m_sort(&sd[0], N, int_greater());
 		t = (clock()-t)/CLOCKS_PER_SEC;
 //		bool q=true;
 //		for(int i=1;i<N;i++) if(sd[i]<sd[i-1]) q=false;
