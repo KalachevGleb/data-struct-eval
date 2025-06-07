@@ -93,7 +93,7 @@ RBTBase::RBTNodeBase * RBTBase::rightrot(RBTBase::RBTNodeBase *x){
 	x->setP(c);           /*    / \             / \   */
 	return c;             /*   s   t           t   u  */
 }
-RBTBase::RBTNodeBase * RBTBase::leftrot(RBTNodeBase *t){
+RBTBase::RBTNodeBase * RBTBase::left_rot(RBTNodeBase *t){
 	RBTNodeBase *c = t->right();
 	t->setR(c->left());   /*     x               c    */
 	c->setL(t);           /*    / \             / \   */
@@ -157,7 +157,7 @@ void RBTBase::insbalance(RBTBase::RBTNodeBase *x){
 		else x = rightrot(P);                  //2nd case
 	}else{//x == P->r
 		if(x->left()->c() == RED)x = rightlongrot(P); //symmetric to 1st case;
-		else x = leftrot(P);                   //symmetric to 2nd case;
+		else x = left_rot(P);                   //symmetric to 2nd case;
 	}
 	P->setC(RED); x->setC(BLACK);
 	x->setP(pp);
@@ -204,7 +204,7 @@ void RBTBase::delbalance(RBTBase::RBTNodeBase *x, RBTBase::RBTNodeBase *pn){
 			}else{  //then D is RED, 2nd case
 				C->setC(P->c());
 				D->setC(BLACK);
-				x = leftrot(P);
+				x = left_rot(P);
 			}
 		}else{ //then x == P->r
 			if(B->c() == BLACK){ //then  D is RED, symmetric to 1st case
@@ -233,7 +233,7 @@ void RBTBase::delbalance(RBTBase::RBTNodeBase *x, RBTBase::RBTNodeBase *pn){
 		if(x == P->left()){
 			if(B->right()->c()==BLACK){
 				if(B->left()->c()==BLACK){  /*      [P]                  [C]     */
-					x = leftrot(P);         /*     /   \                /   \    */
+					x = left_rot(P);         /*     /   \                /   \    */
 					B->setC(RED);           /*  [[x]]  (C)            [P]   [D]  */
 					C->setC(BLACK);         /*         / \    --->    / \        */
 					/* */                   /*       [B] [D]        [x] (B)      */

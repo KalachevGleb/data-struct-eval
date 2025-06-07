@@ -60,7 +60,7 @@ protected:
 	};
 
 	static RBTNodeBase * rightrot(RBTNodeBase *n);
-	static RBTNodeBase * leftrot(RBTNodeBase * n);
+	static RBTNodeBase * left_rot(RBTNodeBase * n);
 	static RBTNodeBase *rightlongrot(RBTNodeBase * n);
 	static RBTNodeBase * leftlongrot(RBTNodeBase *n);
 	void insbalance(RBTNodeBase *x);
