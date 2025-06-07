@@ -1,7 +1,18 @@
+
 project(data_structures)
 cmake_minimum_required(VERSION 3.12)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_CXX_STANDARD 17)
+
+option(ENABLE_CLANG_TIDY "Run clang-tidy during builds" OFF)
+if(ENABLE_CLANG_TIDY)
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+    if(CLANG_TIDY_EXE)
+        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+    endif()
+endif()
 
 add_library(data_structures STATIC
         search_tree/avltree.cpp search_tree/BTree.cpp search_tree/rbtree.cpp
