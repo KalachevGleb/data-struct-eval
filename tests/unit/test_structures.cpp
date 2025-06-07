@@ -84,9 +84,9 @@ TEST_CASE("PriorityQueue basic operations") {
     pq.init(3,10);
     pq[0]+=2;
     pq[1]+=3;
-    REQUIRE(pq.maxW()==3);
+    REQUIRE(pq.max_weight()==3);
     pq[1]-=3;
-    REQUIRE(pq.maxW()==2);
+    REQUIRE(pq.max_weight()==2);
 }
 
 TEST_CASE("PST basic operations") {
