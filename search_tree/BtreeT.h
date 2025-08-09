@@ -559,7 +559,7 @@ public:
 			if (!_n)return *this;
 			while (_n->p)_n = _n->p;
 			while (!_n->is_leaf)
-				_n = this->_t->down(_n)[0];
+				_n = _n->dn[0];
 			_pos = 0;
 			return *this;
 		}
@@ -571,8 +571,8 @@ public:
 		}
 
 		bool isValid()const{ return _n && _pos < _n->knum; }
-		const K& key()const{ return this->_t->keys[this->_pos]; }
-		const K* operator->()const{ return (const K*)(this->_t->keys + _pos); }
+		const K& key()const{ return (const K&)_n->keys[_pos]; }
+		const K* operator->()const{ return (const K*)(_n->keys + _pos); }
 		const_iterator& operator++(){
 			if (_n->is_leaf){
 				if (++_pos < _n->knum)return *this;

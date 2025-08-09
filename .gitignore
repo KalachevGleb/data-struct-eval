@@ -36,6 +36,7 @@ Win32/
 ipch/
 
 # Compiled Object files
+build/
 *.slo
 *.lo
 *.o
