@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 #include <iterator>
+#include <tuple>
 
 // RangeTree: a 2D range tree over keys of type K with lower-level structure Sub.
 // Template parameters:
@@ -100,6 +101,95 @@ public:
         std::size_t size() const { return parts_.size(); }
     private:
         std::vector<R> parts_;
+    };
+
+    // A fully lazy forward range over elements inside keys [b1;b2), no dynamic allocations.
+    template <class... Xs>
+    class LazyRange {
+    public:
+        class iterator {
+        public:
+            using R = decltype(std::declval<const Sub&>().range(std::declval<const Xs&>()...));
+            using InnerIt = decltype(std::declval<R&>().begin());
+            using value_type = typename std::iterator_traits<InnerIt>::value_type;
+            using difference_type = std::ptrdiff_t;
+            using reference = decltype(*std::declval<InnerIt&>());
+            using iterator_category = std::forward_iterator_tag;
+
+            iterator(): owner_(nullptr), ended_(true), top_(0) {}
+            explicit iterator(const LazyRange* owner, bool is_end): owner_(owner), ended_(is_end), top_(0) {
+                if (!ended_) init_begin();
+            }
+            reference operator*() const { return *it_; }
+            iterator& operator++(){
+                ++it_;
+                if (it_ == it_end_) advance_node();
+                return *this;
+            }
+            bool operator==(const iterator& o) const{
+                if (ended_ && o.ended_) return true;
+                return ended_ == o.ended_ && owner_ == o.owner_ && it_ == o.it_ && top_ == o.top_;
+            }
+            bool operator!=(const iterator& o) const { return !(*this == o); }
+        private:
+            static constexpr int kMaxH = 128;
+            const LazyRange* owner_;
+            bool ended_;
+            const Node* stack_[kMaxH];
+            int top_;
+            R cur_range_{};
+            InnerIt it_{};
+            InnerIt it_end_{};
+
+            void init_begin(){
+                push_left(owner_->root_);
+                advance_node();
+            }
+            void push_left(const Node* n){
+                while (n){
+                    if (owner_->owner_->less_k_b(n->key, owner_->b1_)){
+                        n = n->r;
+                    } else if (!owner_->owner_->less_k_b(n->key, owner_->b2_)){
+                        n = n->l;
+                    } else {
+                        if (top_ < kMaxH) stack_[top_++] = n; // capped; expected log n
+                        n = n->l;
+                    }
+                }
+            }
+            template<class Tuple, std::size_t... I>
+            R make_range_impl(const Sub& s, const Tuple& t, std::index_sequence<I...>) const{
+                return s.range(std::get<I>(t)...);
+            }
+            R make_range(const Sub& s) const{
+                return make_range_impl(s, owner_->xs_, std::index_sequence_for<Xs...>{});
+            }
+            void advance_node(){
+                while (top_ > 0){
+                    const Node* n = stack_[--top_];
+                    // setup current range
+                    cur_range_ = make_range(n->self);
+                    it_ = cur_range_.begin();
+                    it_end_ = cur_range_.end();
+                    // prepare right subtree for future
+                    push_left(n->r);
+                    if (it_ != it_end_) return;
+                }
+                ended_ = true;
+            }
+        };
+
+        LazyRange(const RangeTree* owner, const B& b1, const B& b2, const Xs&... xs)
+        : owner_(owner), root_(owner->root_), b1_(b1), b2_(b2), xs_(xs...){ }
+
+        iterator begin() const { return iterator(this, false); }
+        iterator end() const { return iterator(this, true); }
+    private:
+        const RangeTree* owner_;
+        const Node* root_;
+        B b1_;
+        B b2_;
+        std::tuple<std::decay_t<Xs>...> xs_;
     };
 
     RangeTree(): rng_(random_seed_()) {}
@@ -237,12 +327,7 @@ public:
     // Sub must provide: auto range(const Xs&...) const -> R, where R has begin()/end().
     template <class... Xs>
     auto range(const B& b1, const B& b2, const Xs&... xs) const {
-        using R = decltype(std::declval<const Sub&>().range(xs...));
-        std::vector<R> parts;
-        parts.reserve(32);
-        // Collect per-key ranges by recursive scan over keys in [b1;b2)
-        collect_key_ranges(root_, b1, b2, parts, xs...);
-        return ConcatRange<R>(std::move(parts));
+        return LazyRange<Xs...>(this, b1, b2, xs...);
     }
 
 private:
