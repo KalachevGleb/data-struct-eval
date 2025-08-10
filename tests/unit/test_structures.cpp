@@ -263,8 +263,76 @@ TEST_CASE("RangeTree randomized against naive for 2D rectangles") {
 
 // Simple compile-time construction test for 3D default alias
 TEST_CASE("RangeTree ND alias build (3D)") {
-    using RT3 = typename ds::MakeRangeTree<int,int,int>::type; // 3D: y,z as outer layers, x as leaf set
+    using RT3 = ds::RangeTreeND<int,int,int>; // 3D: y,z as outer layers, x as leaf set
     RT3 *ptr = nullptr;
     REQUIRE(ptr == nullptr);
+}
+
+TEST_CASE("RangeTreeNDPoints basic 3D usage"){
+    using RTP = ds::RangeTreeNDPointsT<int,int,int>;
+    RTP rt;
+    rt.insert(1,2,3);
+    rt.insert(4,5,6);
+    std::vector<std::tuple<int,int,int>> v;
+    for (auto t : rt.range(1,2, 2,6, 0,10)) v.push_back(t);
+    std::sort(v.begin(), v.end());
+    REQUIRE(v.size() == 1);
+    REQUIRE(v[0] == std::make_tuple(1,2,3));
+}
+
+struct P3 { int x,y,z; };
+struct CmpZYX {
+    bool operator()(const P3& a, const P3& b) const{
+        if (a.z != b.z) return a.z < b.z;
+        if (a.y != b.y) return a.y < b.y;
+        return a.x < b.x;
+    }
+};
+
+TEST_CASE("RangeTreeND randomized 3D vs naive"){
+    using RT3 = ds::RangeTreeND<int,int,int>;
+    RT3 rt;
+    std::set<P3, CmpZYX> base;
+    std::mt19937 rng(987654321);
+    auto rnd = [&](int lo, int hi){ std::uniform_int_distribution<int> d(lo,hi); return d(rng); };
+
+    auto check_once = [&](){
+        int z1 = rnd(0, 1000); int z2 = rnd(z1, 1001);
+        int y1 = rnd(0, 1000); int y2 = rnd(y1, 1001);
+        int x1 = rnd(0, 1000); int x2 = rnd(x1, 1001);
+        std::vector<int> got;
+        for (int x : rt.range(z1,z2, y1,y2, x1,x2)) got.push_back(x);
+        std::sort(got.begin(), got.end());
+        std::vector<int> exp;
+        for (auto &p : base){
+            if (p.z>=z1 && p.z<z2 && p.y>=y1 && p.y<y2 && p.x>=x1 && p.x<x2) exp.push_back(p.x);
+        }
+        std::sort(exp.begin(), exp.end());
+        REQUIRE(got.size() == exp.size());
+        for (size_t i=0;i<exp.size();++i) REQUIRE(got[i]==exp[i]);
+    };
+
+    const int ops = 4000;
+    for (int i=1;i<=ops;++i){
+        int t = rnd(0,99);
+        if (t < 60 || base.empty()){
+            P3 p{ rnd(0,1000), rnd(0,1000), rnd(0,1000) };
+            if (!base.count(p)){
+                base.insert(p);
+                rt.insert(p.z, p.y, p.x);
+            }
+        } else if (t < 90) {
+            int k = rnd(0, (int)base.size()-1);
+            auto it = base.begin();
+            std::advance(it, k);
+            P3 p = *it;
+            base.erase(it);
+            rt.remove(p.z, p.y, p.x);
+        } else {
+            for (int q=0;q<4;++q) check_once();
+        }
+        if (i % 50 == 0) check_once();
+    }
+    for (int q=0;q<20;++q) check_once();
 }
 

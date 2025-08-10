@@ -8,6 +8,7 @@
 #include <vector>
 #include <iterator>
 #include <tuple>
+#include <memory>
 
 // RangeTree: a 2D range tree over keys of type K with lower-level structure Sub.
 // Template parameters:
@@ -39,7 +40,7 @@ namespace ds {
 
 template <class K, class B, class Cmp, class Sub>
 class RangeTree {
-private:
+public:
     struct Node{
         K key;
         uint32_t pri;
@@ -50,7 +51,6 @@ private:
 
         explicit Node(const K& k, uint32_t p): key(k), pri(p), l(nullptr), r(nullptr), self(), agg() {}
     };
-public:
     // A forward range that concatenates multiple per-Sub ranges of the same type R
     template <class R>
     class ConcatRange {
@@ -122,10 +122,11 @@ public:
         public:
             using R = decltype(std::declval<const Sub&>().range(std::declval<const Xs&>()...));
             using InnerIt = decltype(std::declval<R&>().begin());
-            using value_type = typename std::iterator_traits<InnerIt>::value_type;
             using difference_type = std::ptrdiff_t;
             using reference = decltype(*std::declval<InnerIt&>());
+            using value_type = std::remove_cv_t<std::remove_reference_t<reference>>;
             using iterator_category = std::forward_iterator_tag;
+            using pointer = void*;
 
             iterator(): owner_(nullptr), ended_(true), top_(0) {}
             explicit iterator(const LazyRange* owner, bool is_end): owner_(owner), ended_(is_end), top_(0) {
@@ -148,7 +149,7 @@ public:
             bool ended_;
             const Node* stack_[kMaxH];
             int top_;
-            R cur_range_{};
+            std::unique_ptr<R> cur_range_;
             InnerIt it_{};
             InnerIt it_end_{};
 
@@ -179,9 +180,9 @@ public:
                 while (top_ > 0){
                     const Node* n = stack_[--top_];
                     // setup current range
-                    cur_range_ = make_range(n->self);
-                    it_ = cur_range_.begin();
-                    it_end_ = cur_range_.end();
+                    cur_range_.reset(new R(make_range(n->self)));
+                    it_ = cur_range_->begin();
+                    it_end_ = cur_range_->end();
                     // prepare right subtree for future
                     push_left(n->r);
                     if (it_ != it_end_) return;
@@ -342,7 +343,7 @@ public:
     }
 
 private:
-
+    
     Node* root_ = nullptr;
     Cmp cmp_{};
     std::mt19937 rng_;
