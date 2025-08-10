@@ -14,6 +14,7 @@
 #include <set>
 #include <climits>
 #include <random>
+#include "rangetree_nd.h"
 
 namespace {
 struct Point { int x; int y; };
@@ -258,5 +259,12 @@ TEST_CASE("RangeTree randomized against naive for 2D rectangles") {
 
     // final checks
     for (int q=0;q<20;++q) check_once();
+}
+
+// Simple compile-time construction test for 3D default alias
+TEST_CASE("RangeTree ND alias build (3D)") {
+    using RT3 = typename ds::MakeRangeTree<int,int,int>::type; // 3D: y,z as outer layers, x as leaf set
+    RT3 *ptr = nullptr;
+    REQUIRE(ptr == nullptr);
 }
 

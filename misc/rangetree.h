@@ -39,6 +39,17 @@ namespace ds {
 
 template <class K, class B, class Cmp, class Sub>
 class RangeTree {
+private:
+    struct Node{
+        K key;
+        uint32_t pri;
+        Node* l;
+        Node* r;
+        Sub self; // values having exactly this key
+        Sub agg;  // aggregate for entire subtree rooted at this node
+
+        explicit Node(const K& k, uint32_t p): key(k), pri(p), l(nullptr), r(nullptr), self(), agg() {}
+    };
 public:
     // A forward range that concatenates multiple per-Sub ranges of the same type R
     template <class R>
@@ -331,16 +342,6 @@ public:
     }
 
 private:
-    struct Node{
-        K key;
-        uint32_t pri;
-        Node* l;
-        Node* r;
-        Sub self; // values having exactly this key
-        Sub agg;  // aggregate for entire subtree rooted at this node
-
-        explicit Node(const K& k, uint32_t p): key(k), pri(p), l(nullptr), r(nullptr), self(), agg() {}
-    };
 
     Node* root_ = nullptr;
     Cmp cmp_{};
